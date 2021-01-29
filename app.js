@@ -22,6 +22,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+
+
 // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
 //   next(createError(404));
@@ -40,12 +42,20 @@ app.use(function(err, req, res, next) {
 
 // ------- OAuth2.0 --------
 
-const passport = require("pass port");
+const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const keys = require('./config/keys');
 const Users = require('./models/Users');
 const cookieSession = require('cookie-session');
 
+
+// app.use(require('express-session')({
+//   secret: keys.session.cookieKey,
+//   resave: true,
+//   saveUninitialized: true
+// }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 passport.use(
   new GoogleStrategy(
@@ -93,19 +103,20 @@ app.use(cookieSession({
   keys:[keys.session.cookieKey]
 }));
 
-app.get('/auth/google', passport.authenticate("google", {
-  scope : ["profile" , "email"]
-}));
+app.get('/error', (req, res) => res.send("<h1>Error!</h1>"));
 
-app.get('/auth/google/redirect', passport.authenticate("google", (req, res) => {
-  // res.send(req.user);
-  res.send("You reached the redirected URL");
-}));
+app.get('/auth/google', 
+  passport.authenticate("google", { scope : ["profile" , "email"] }));
+
+app.get('/auth/google/redirect',
+  passport.authenticate('google', { failureRedirect:'/error'}), function(req, res){
+    res.send('<h2>Don</h2');
+  })
 
 app.get('/auth/logout', (req, res) => {
   req.logout();
   // res.send(req.user);
-  res.send('<h1>logged out</h1>');
+  res.redirect('/');
 });  
 
 module.exports = app;
