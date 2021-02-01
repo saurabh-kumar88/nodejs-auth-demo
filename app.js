@@ -22,8 +22,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-
-
 // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
 //   next(createError(404));
@@ -48,12 +46,12 @@ const keys = require('./config/keys');
 const Users = require('./models/Users');
 const cookieSession = require('cookie-session');
 
-
 // app.use(require('express-session')({
 //   secret: keys.session.cookieKey,
 //   resave: true,
 //   saveUninitialized: true
 // }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -110,7 +108,7 @@ app.get('/auth/google',
 
 app.get('/auth/google/redirect',
   passport.authenticate('google', { failureRedirect:'/error'}), function(req, res){
-    res.send('<h2>Don</h2');
+    res.send(`<h2>Welcome back ${req.user}</h2>`);
   })
 
 app.get('/auth/logout', (req, res) => {
